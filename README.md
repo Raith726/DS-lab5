@@ -7,6 +7,10 @@ Diseno de Software, UTEC. Dos aplicaciones en Java 17 con Spring Boot, Thymeleaf
 | Predicciones Champions League | `champions/` | https://champions.silosense.dev | `raith726/champions-app:1.0` |
 | Estudio de marketing | `marketing/` | https://marketing.silosense.dev | `raith726/marketing-app:1.0` |
 
+Video de demostracion: https://drive.google.com/drive/folders/1sW-rVmsPXvxLWOZRbxNm0YuJ4FSnfiCR?usp=sharing
+
+Informe: `Informe_Lab5.docx`. Capturas: `evidencias/`.
+
 ## Pregunta 1: Champions League
 
 Arquitectura en 3 capas:

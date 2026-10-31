@@ -1,0 +1,13 @@
+NAMES             IMAGE                           STATUS
+marketing-app-1   raith726/marketing-app:1.0      Up 3 minutes
+marketing-db-1    postgres:16                     Up 3 minutes (healthy)
+deploy-tunel-1    cloudflare/cloudflared:latest   Up 4 minutes
+champions-app-1   raith726/champions-app:1.0      Up 4 minutes
+champions-db-1    postgres:16                     Up 4 minutes (healthy)
+champions_champions_data
+marketing_marketing_data
+marketing_marketing_media
+   189
+
+     3
+
