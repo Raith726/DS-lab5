@@ -62,7 +62,7 @@ public class GuionesClient {
 
         try {
 
-            return leerGuiones(descripcion, 
+            return leerGuiones(descripcion,
                 tieneVision()
                     ? llamarGemini(prompt, foto, tipoFoto)
                     : llamarPollinations(prompt)
@@ -75,7 +75,7 @@ public class GuionesClient {
                 Thread.sleep(46000);
             }
 
-            return leerGuiones(descripcion, 
+            return leerGuiones(descripcion,
                 tieneVision()
                     ? llamarGemini(prompt, foto, tipoFoto)
                     : llamarPollinations(prompt)
@@ -90,14 +90,12 @@ public class GuionesClient {
             ? "El negocio y el producto son los que se ven en la foto adjunta."
             : "Negocio y producto: " + descripcion + ".";
 
-        return "Eres redactor publicitario de una agencia en Peru. " + negocio
-            + " Propone 3 guiones distintos para una campana en Instagram: uno emocional, uno divertido y uno directo a la venta."
-            + " Responde solo con JSON valido, sin texto adicional, con esta forma exacta:"
-            + " {\"guiones\":[{\"titulo\":\"maximo 6 palabras\",\"texto\":\"guion de maximo 60 palabras\","
-            + "\"caption\":\"texto de la publicacion con 3 hashtags\","
-            + "\"frases\":[\"frase de maximo 7 palabras\",\"frase 2\",\"frase 3\"],"
-            + "\"prompts\":[\"detailed English photo prompt showing the product, no text\",\"second English photo prompt showing the product\",\"third English photo prompt showing the product\"]}]}. El campo prompts es una sola lista con 3 textos."
-            + " Todo en espanol con tildes y ortografia correcta, excepto prompts, que van en ingles.";
+        return "Eres redactor publicitario en Peru. " + negocio
+            + " Propone 3 guiones para Instagram: emocional, divertido y directo."
+            + " Responde solo JSON: {\"guiones\":[{\"titulo\":\"\",\"texto\":\"\",\"caption\":\"\",\"frases\":[\"\",\"\",\"\"],\"prompts\":[\"\",\"\",\"\"]}]}."
+            + " titulo: maximo 5 palabras. texto: maximo 35 palabras. caption: maximo 15 palabras y 2 hashtags."
+            + " frases: 3 frases de maximo 6 palabras. prompts: 3 descripciones de foto en ingles de maximo 20 palabras, mostrando el producto."
+            + " Usa tildes correctas en espanol.";
     }
 
 
