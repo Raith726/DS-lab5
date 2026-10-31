@@ -37,7 +37,7 @@ public class Prediccion {
     public String getAcierto() {
 
         if (partido.getGolesLocal() == null) {
-            return "Sin resultado";
+            return "Por jugar";
         }
 
         int real = Integer.compare(partido.getGolesLocal(), partido.getGolesVisitante());

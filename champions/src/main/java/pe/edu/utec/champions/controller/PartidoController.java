@@ -32,7 +32,8 @@ public class PartidoController {
             Model model
     ) {
 
-        model.addAttribute("partidos", service.listarTodos());
+        model.addAttribute("proximos", service.listarProximos());
+        model.addAttribute("jugados", service.listarJugados());
 
         return "partidos/lista";
     }

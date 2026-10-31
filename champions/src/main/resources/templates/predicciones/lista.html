@@ -26,7 +26,7 @@
             </div>
             <div class="marcador" th:text="${x.golesLocal} + ' - ' + ${x.golesVisitante}"></div>
             <div class="marcador" th:classappend="${x.partido.golesLocal == null} ? 'vacio'"
-                 th:text="${x.partido.golesLocal != null} ? ${x.partido.golesLocal} + ' - ' + ${x.partido.golesVisitante} : 'Sin dato'"></div>
+                 th:text="${x.partido.golesLocal != null} ? ${x.partido.golesLocal} + ' - ' + ${x.partido.golesVisitante} : 'Por jugar'"></div>
             <div class="estado">
                 <span class="chip" th:classappend="${x.acierto == 'Marcador exacto'} ? 'exacto' : (${x.acierto == 'Acerto ganador'} ? 'resultado')" th:text="${x.acierto}"></span>
             </div>

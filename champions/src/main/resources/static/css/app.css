@@ -153,6 +153,15 @@ input::placeholder { color: var(--suave); }
 
 .marcador.vacio { color: var(--suave); font-size: 1rem; font-weight: 600; }
 
+.grupo {
+    margin: 32px 0 12px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.fecha.jugado { text-align: center; }
+
 .boton {
     display: inline-block;
     min-height: 44px;

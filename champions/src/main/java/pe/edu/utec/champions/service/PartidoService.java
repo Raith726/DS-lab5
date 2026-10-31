@@ -9,7 +9,9 @@ public interface PartidoService {
 
     int cargarDesdeApi() throws Exception;
 
-    List<Partido> listarTodos();
+    List<Partido> listarProximos();
+
+    List<Partido> listarJugados();
 
     Partido obtenerPorId(Long id);
 }

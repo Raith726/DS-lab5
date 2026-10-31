@@ -34,18 +34,24 @@ public class PartidoServiceImpl
 
         for (Partido partido : apiClient.obtenerPartidos()) {
 
-            boolean existe =
-                repository.existsByFechaAndEquipoLocalAndEquipoVisitante(
-                    partido.getFecha(),
-                    partido.getEquipoLocal(),
-                    partido.getEquipoVisitante()
-                );
+            Partido guardado =
+                repository.findByApiId(partido.getApiId()).orElse(null);
 
-            if (!existe) {
+            if (guardado == null) {
 
                 repository.save(partido);
 
                 nuevos++;
+
+            } else {
+
+                guardado.setRonda(partido.getRonda());
+                guardado.setFecha(partido.getFecha());
+                guardado.setHora(partido.getHora());
+                guardado.setGolesLocal(partido.getGolesLocal());
+                guardado.setGolesVisitante(partido.getGolesVisitante());
+
+                repository.save(guardado);
             }
         }
 
@@ -54,9 +60,16 @@ public class PartidoServiceImpl
 
 
     @Override
-    public List<Partido> listarTodos() {
+    public List<Partido> listarProximos() {
 
-        return repository.findAllByOrderByFechaAscHoraAscIdAsc();
+        return repository.findByGolesLocalIsNullOrderByFechaAscHoraAsc();
+    }
+
+
+    @Override
+    public List<Partido> listarJugados() {
+
+        return repository.findByGolesLocalIsNotNullOrderByFechaDescHoraDesc();
     }
 
 

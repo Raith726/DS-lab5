@@ -28,19 +28,19 @@ flowchart LR
         R[Repositories JPA]
     end
     C --> S --> R --> DB[(PostgreSQL)]
-    S --> A[PartidoApiClient] --> API[API openfootball]
+    S --> A[PartidoApiClient] --> API[API de ESPN]
 ```
 
 Flujo de datos:
 
 1. Al arrancar, `CargaInicial` llama a `PartidoService.cargarDesdeApi()`.
-2. `PartidoApiClient` pide el JSON de la temporada 2024/25 y lo convierte en objetos `Partido`.
-3. El servicio guarda solo los partidos que no existen, por eso reiniciar no duplica datos.
-4. `GET /partidos` muestra los partidos guardados.
-5. `POST /partidos/{id}/prediccion` valida que el marcador coincida con el resultado y guarda la `Prediccion` con su `partido_id`.
+2. `PartidoApiClient` pide mes por mes el JSON de la temporada 2026/27 y lo convierte en objetos `Partido`.
+3. El servicio guarda los partidos nuevos y actualiza el marcador de los existentes. Reiniciar no duplica datos, y cada hora vuelve a consultar la API.
+4. `GET /partidos` muestra los proximos partidos y los ya jugados.
+5. `POST /partidos/{id}/prediccion` revisa que el partido no se haya jugado y que el marcador coincida con el resultado, y guarda la `Prediccion` con su `partido_id`.
 6. `GET /predicciones` muestra las predicciones con el marcador real del partido.
 
-Fuente de datos: https://raw.githubusercontent.com/openfootball/football.json/master/2024-25/uefa.cl.json
+Fuente de datos: https://site.api.espn.com/apis/site/v2/sports/soccer/uefa.champions/scoreboard?dates=202610 (API publica de ESPN, sin key y sin documentacion oficial).
 
 ### Ejecucion local
 
@@ -59,7 +59,7 @@ flowchart LR
     U[Navegador] --> C[CampanaController]
     C --> S[CampanaService]
     S --> DB[(PostgreSQL)]
-    S --> G[GuionesClient] --> IA[Gemini o Pollinations]
+    S --> G[GuionesClient] --> IA[Gemini]
     S --> A[GeneracionService]
     A --> I[ImagenClient] --> P[Pollinations]
     A --> F[VideoClient] --> M[ffmpeg]
@@ -69,11 +69,11 @@ flowchart LR
 
 Flujo:
 
-1. El usuario sube una foto y describe el negocio.
-2. El sistema propone 3 guiones con IA. Con `GEMINI_API_KEY` la IA analiza la foto; sin ella usa la descripcion.
+1. El usuario sube una foto. La descripcion del negocio es opcional.
+2. Gemini analiza la foto y propone 3 guiones. Sin `GEMINI_API_KEY` se usa Pollinations y la descripcion pasa a ser obligatoria.
 3. El usuario elige un guion.
-4. El sistema genera 3 fotos con IA y arma un video vertical de 16 segundos con ffmpeg.
-5. Al publicar, sube un carrusel con las fotos y un reel con el video a Instagram, y guarda los enlaces.
+4. Pollinations genera 3 fotos con las descripciones que escribio Gemini, y ffmpeg arma un video vertical de 16 segundos.
+5. La publicacion en Instagram esta programada con su API oficial (carrusel y reel). No se ejecuto porque Meta exige verificar la cuenta de desarrollador.
 
 TikTok no se usa porque exige auditar la aplicacion antes de publicar contenido publico.
 
@@ -95,8 +95,8 @@ Variables de `.env`:
 | `APP_PORT` | Puerto publicado |
 | `APP_BASE_URL` | URL publica, Instagram descarga los archivos desde ahi |
 | `PUBLICAR_CLAVE` | Clave que pide el formulario para publicar |
-| `GEMINI_API_KEY`, `GEMINI_MODEL` | Analisis de la foto (opcional) |
-| `INSTAGRAM_USER_ID`, `INSTAGRAM_TOKEN` | Cuenta profesional de Instagram |
+| `GEMINI_API_KEY`, `GEMINI_MODEL` | Analisis de la foto y guiones |
+| `INSTAGRAM_USER_ID`, `INSTAGRAM_TOKEN` | Cuenta profesional de Instagram, para publicar |
 
 ## Despliegue en AWS
 

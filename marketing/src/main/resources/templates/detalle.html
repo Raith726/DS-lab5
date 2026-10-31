@@ -19,7 +19,7 @@
         <img th:src="@{/media/{f}(f=${campana.foto})}" alt="Foto subida">
         <div>
             <h1 th:text="${elegido != null} ? ${elegido.titulo} : 'Elige un guion'"></h1>
-            <p class="intro" th:text="${campana.descripcion}"></p>
+            <p class="intro" th:if="${campana.descripcion != null and !#strings.isEmpty(campana.descripcion)}" th:text="${campana.descripcion}"></p>
         </div>
     </section>
 

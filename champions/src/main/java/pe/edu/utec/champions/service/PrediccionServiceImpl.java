@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import pe.edu.utec.champions.model.Partido;
 import pe.edu.utec.champions.model.Prediccion;
 import pe.edu.utec.champions.repository.PrediccionRepository;
 
@@ -37,9 +38,18 @@ public class PrediccionServiceImpl
 
         validar(resultado, golesLocal, golesVisitante);
 
+        Partido partido = partidoService.obtenerPorId(partidoId);
+
+        if (partido.isJugado()) {
+
+            throw new IllegalArgumentException(
+                "Este partido ya se jugo, elija uno de los proximos"
+            );
+        }
+
         Prediccion prediccion = new Prediccion();
 
-        prediccion.setPartido(partidoService.obtenerPorId(partidoId));
+        prediccion.setPartido(partido);
         prediccion.setResultado(resultado);
         prediccion.setGolesLocal(golesLocal);
         prediccion.setGolesVisitante(golesVisitante);

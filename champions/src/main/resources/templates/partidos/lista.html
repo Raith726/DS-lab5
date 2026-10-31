@@ -6,14 +6,14 @@
 <main class="pagina">
     <h1>Partidos de la Champions</h1>
     <p class="subtitulo">
-        <span id="contador" th:text="${#lists.size(partidos)}"></span> partidos guardados en la base de datos. Temporada 2024/25.
+        <span id="contador" th:text="${#lists.size(proximos) + #lists.size(jugados)}"></span> partidos guardados en la base de datos. Temporada 2026/27, hora de Lima.
     </p>
 
-    <div th:if="${#lists.isEmpty(partidos)}" class="aviso error">
+    <div th:if="${#lists.isEmpty(proximos) and #lists.isEmpty(jugados)}" class="aviso error">
         No hay partidos guardados. Revise la conexion con la API y reinicie la aplicacion.
     </div>
 
-    <div class="filtros" th:unless="${#lists.isEmpty(partidos)}">
+    <div class="filtros" th:unless="${#lists.isEmpty(proximos) and #lists.isEmpty(jugados)}">
         <div>
             <label for="buscar">Buscar equipo</label>
             <input id="buscar" type="search" placeholder="Barcelona, Inter, Arsenal...">
@@ -27,18 +27,36 @@
     </div>
 
     <div id="lista">
-        <article class="partido" th:each="p : ${partidos}"
+        <section th:unless="${#lists.isEmpty(proximos)}">
+            <h2 class="grupo">Próximos partidos</h2>
+        <article class="partido" th:each="p : ${proximos}"
                  th:attr="data-ronda=${p.ronda},data-equipos=${#strings.toLowerCase(p.equipoLocal + ' ' + p.equipoVisitante)}">
             <div class="fecha">
-                <div th:text="${#temporals.format(p.fecha, 'dd/MM/yyyy')}"></div>
+                <div th:text="${#temporals.format(p.fecha, 'dd/MM/yyyy')} + ' ' + ${p.hora}"></div>
                 <div th:text="${p.ronda}"></div>
             </div>
             <div class="equipo local" th:text="${p.equipoLocal}"></div>
-            <div class="marcador" th:classappend="${p.golesLocal == null} ? 'vacio'"
-                 th:text="${p.golesLocal != null} ? ${p.golesLocal} + ' - ' + ${p.golesVisitante} : 'Sin dato'"></div>
+            <div class="marcador" th:classappend="${p.jugado} ? '' : 'vacio'"
+                 th:text="${p.jugado} ? ${p.golesLocal} + ' - ' + ${p.golesVisitante} : 'vs'"></div>
             <div class="equipo" th:text="${p.equipoVisitante}"></div>
             <a class="boton" th:href="@{/partidos/{id}/prediccion(id=${p.id})}">Predecir</a>
         </article>
+        </section>
+        <section th:unless="${#lists.isEmpty(jugados)}">
+            <h2 class="grupo">Partidos jugados</h2>
+        <article class="partido" th:each="p : ${jugados}"
+                 th:attr="data-ronda=${p.ronda},data-equipos=${#strings.toLowerCase(p.equipoLocal + ' ' + p.equipoVisitante)}">
+            <div class="fecha">
+                <div th:text="${#temporals.format(p.fecha, 'dd/MM/yyyy')} + ' ' + ${p.hora}"></div>
+                <div th:text="${p.ronda}"></div>
+            </div>
+            <div class="equipo local" th:text="${p.equipoLocal}"></div>
+            <div class="marcador" th:classappend="${p.jugado} ? '' : 'vacio'"
+                 th:text="${p.jugado} ? ${p.golesLocal} + ' - ' + ${p.golesVisitante} : 'vs'"></div>
+            <div class="equipo" th:text="${p.equipoVisitante}"></div>
+            <div class="fecha jugado">Finalizado</div>
+        </article>
+        </section>
     </div>
     <p id="sinResultados" class="vacio-grande" hidden>Ningun partido coincide con esa busqueda.</p>
 </main>
@@ -62,6 +80,10 @@
 
             document.getElementById('contador').textContent = visibles;
             document.getElementById('sinResultados').hidden = visibles > 0;
+
+            document.querySelectorAll('#lista section').forEach(g => {
+                g.hidden = !g.querySelector('.partido:not([hidden])');
+            });
         }
 
         buscar.addEventListener('input', filtrar);

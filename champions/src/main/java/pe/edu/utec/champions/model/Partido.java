@@ -6,17 +6,15 @@ import jakarta.persistence.*;
 
 
 @Entity
-@Table(
-    name = "partidos",
-    uniqueConstraints = @UniqueConstraint(
-        columnNames = {"fecha", "equipo_local", "equipo_visitante"}
-    )
-)
+@Table(name = "partidos")
 public class Partido {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "api_id", nullable = false, unique = true, length = 30)
+    private String apiId;
 
     @Column(nullable = false, length = 60)
     private String ronda;
@@ -41,6 +39,21 @@ public class Partido {
 
 
     public Partido() {
+    }
+
+
+    public boolean isJugado() {
+        return golesLocal != null;
+    }
+
+
+    public String getApiId() {
+        return apiId;
+    }
+
+
+    public void setApiId(String apiId) {
+        this.apiId = apiId;
     }
 
 

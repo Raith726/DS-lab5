@@ -10,6 +10,8 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +24,9 @@ import pe.edu.utec.marketing.model.Guion;
 
 @Component
 public class GuionesClient {
+
+    private static final Logger log =
+        LoggerFactory.getLogger(GuionesClient.class);
 
     private static final String POLLINATIONS =
         "https://text.pollinations.ai/openai";
@@ -60,46 +65,69 @@ public class GuionesClient {
 
         String prompt = armarPrompt(descripcion);
 
+        if (tieneVision()) {
+
+            return generarConGemini(descripcion, prompt, foto, tipoFoto);
+        }
+
         try {
 
-            return leerGuiones(descripcion,
-                tieneVision()
-                    ? llamarGemini(prompt, foto, tipoFoto)
-                    : llamarPollinations(prompt)
-            );
+            return leerGuiones(descripcion, llamarPollinations(prompt));
 
         } catch (JacksonException | IllegalStateException e) {
 
-            if (!tieneVision()) {
+            Thread.sleep(46000);
 
-                Thread.sleep(46000);
-            }
-
-            return leerGuiones(descripcion,
-                tieneVision()
-                    ? llamarGemini(prompt, foto, tipoFoto)
-                    : llamarPollinations(prompt)
-            );
+            return leerGuiones(descripcion, llamarPollinations(prompt));
         }
+    }
+
+
+    private List<Guion> generarConGemini(
+            String descripcion,
+            String prompt,
+            byte[] foto,
+            String tipoFoto
+    ) throws Exception {
+
+        for (String modelo : List.of(geminiModel, "gemini-flash-lite-latest")) {
+
+            try {
+
+                return leerGuiones(
+                    descripcion,
+                    llamarGemini(modelo, prompt, foto, tipoFoto)
+                );
+
+            } catch (JacksonException | IllegalStateException | java.io.IOException e) {
+
+                log.warn("Fallo el modelo {}: {}", modelo, e.getMessage());
+            }
+        }
+
+        throw new IllegalStateException(
+            "La IA esta saturada en este momento, intente de nuevo en un minuto"
+        );
     }
 
 
     private String armarPrompt(String descripcion) {
 
         String negocio = descripcion == null || descripcion.isBlank()
-            ? "El negocio y el producto son los que se ven en la foto adjunta."
+            ? "Mira con cuidado la foto adjunta: el producto que ves es el que se promociona. Inventa un nombre de marca solo si la foto no muestra uno."
             : "Negocio y producto: " + descripcion + ".";
 
         return "Eres redactor publicitario en Peru. " + negocio
             + " Propone 3 guiones para Instagram: emocional, divertido y directo."
             + " Responde solo JSON: {\"guiones\":[{\"titulo\":\"\",\"texto\":\"\",\"caption\":\"\",\"frases\":[\"\",\"\",\"\"],\"prompts\":[\"\",\"\",\"\"]}]}."
             + " titulo: maximo 5 palabras. texto: maximo 35 palabras. caption: maximo 15 palabras y 2 hashtags."
-            + " frases: 3 frases de maximo 6 palabras. prompts: 3 descripciones de foto en ingles de maximo 20 palabras, mostrando el producto."
+            + " frases: 3 frases de maximo 6 palabras. prompts: 3 descripciones de foto publicitaria en ingles de maximo 30 palabras, sin texto ni personas, que describan el mismo producto con su tipo, color, forma y material exactos, en 3 escenas distintas."
             + " Usa tildes correctas en espanol.";
     }
 
 
     private String llamarGemini(
+            String modelo,
             String prompt,
             byte[] foto,
             String tipoFoto
@@ -121,9 +149,9 @@ public class GuionesClient {
         HttpRequest request =
             HttpRequest.newBuilder(URI.create(
                     "https://generativelanguage.googleapis.com/v1beta/models/"
-                    + geminiModel + ":generateContent"
+                    + modelo + ":generateContent"
                 ))
-                .timeout(Duration.ofSeconds(80))
+                .timeout(Duration.ofSeconds(45))
                 .header("Content-Type", "application/json")
                 .header("x-goog-api-key", geminiKey)
                 .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(cuerpo)))

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 
@@ -26,6 +27,13 @@ public class CargaInicial
 
     @Override
     public void run(ApplicationArguments args) {
+
+        actualizar();
+    }
+
+
+    @Scheduled(initialDelay = 3600000, fixedDelay = 3600000)
+    public void actualizar() {
 
         try {
 
