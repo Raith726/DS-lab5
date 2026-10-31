@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head('Estudio Vitrina')}"></head>
+<body>
+<header th:replace="~{base :: barra}"></header>
+<main class="pagina">
+    <h1>De una foto a tu campaña en Instagram</h1>
+    <p class="intro">Sube la foto de tu producto, elige uno de tres guiones y recibe tres imágenes y un video listos para publicar.</p>
+
+    <p th:if="${#lists.isEmpty(campanas)}" class="vacio">
+        Todavía no hay campañas.
+        <a th:href="@{/campanas/nueva}">Crea la primera con una foto</a>.
+    </p>
+
+    <a class="campana" th:each="c : ${campanas}" th:href="@{/campanas/{id}(id=${c.id})}">
+        <img th:src="@{/media/{f}(f=${c.foto})}" alt="">
+        <div>
+            <div class="nombre" th:text="${c.descripcion != null and !#strings.isEmpty(c.descripcion)} ? ${#strings.abbreviate(c.descripcion, 80)} : ('Campaña ' + ${c.id})"></div>
+            <div class="fecha" th:text="${#temporals.format(c.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></div>
+        </div>
+        <span class="estado" th:classappend="${c.estado}"
+              th:text="${c.estado == 'GUIONES_LISTOS'} ? 'Elegir guion' : (${c.estado == 'GENERANDO'} ? 'Generando' : (${c.estado == 'CONTENIDO_LISTO'} ? 'Lista para publicar' : (${c.estado == 'PUBLICANDO'} ? 'Publicando' : (${c.estado == 'PUBLICADA'} ? 'Publicada' : 'Con error'))))"></span>
+    </a>
+</main>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{nav :: head('Registrar prediccion')}"></head>
+<body>
+<header th:replace="~{nav :: nav('partidos')}"></header>
+<main class="pagina formulario">
+    <h1 th:text="${partido.equipoLocal} + ' vs ' + ${partido.equipoVisitante}"></h1>
+    <p class="cruce" th:text="${partido.ronda} + ' | ' + ${#temporals.format(partido.fecha, 'dd/MM/yyyy')}"></p>
+
+    <div th:if="${error}" class="aviso error" role="alert" th:text="${error}"></div>
+
+    <form method="post" th:action="@{/partidos/{id}/prediccion(id=${partido.id})}">
+        <fieldset class="opciones">
+            <legend>Quien gana</legend>
+            <label class="opcion">
+                <input type="radio" name="resultado" value="LOCAL" required
+                       th:checked="${param.resultado != null and param.resultado[0] == 'LOCAL'}">
+                <span th:text="'Gana ' + ${partido.equipoLocal}"></span>
+            </label>
+            <label class="opcion">
+                <input type="radio" name="resultado" value="EMPATE"
+                       th:checked="${param.resultado != null and param.resultado[0] == 'EMPATE'}">
+                <span>Empate</span>
+            </label>
+            <label class="opcion">
+                <input type="radio" name="resultado" value="VISITANTE"
+                       th:checked="${param.resultado != null and param.resultado[0] == 'VISITANTE'}">
+                <span th:text="'Gana ' + ${partido.equipoVisitante}"></span>
+            </label>
+        </fieldset>
+
+        <div class="goles">
+            <div>
+                <label for="golesLocal">Goles local</label>
+                <input id="golesLocal" name="golesLocal" type="number" min="0" max="30" required th:value="${param.golesLocal}">
+            </div>
+            <div class="guion">-</div>
+            <div>
+                <label for="golesVisitante">Goles visitante</label>
+                <input id="golesVisitante" name="golesVisitante" type="number" min="0" max="30" required th:value="${param.golesVisitante}">
+            </div>
+        </div>
+
+        <div class="acciones">
+            <button class="boton lleno" type="submit">Guardar prediccion</button>
+            <a class="volver" th:href="@{/partidos}">Volver a partidos</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${titulo}"></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header th:fragment="nav(activo)" class="barra">
+    <div class="barra-interior">
+        <a class="marca" th:href="@{/partidos}">Predi<span>Champions</span></a>
+        <nav class="enlaces" aria-label="Principal">
+            <a th:href="@{/partidos}" th:classappend="${activo == 'partidos'} ? 'activo'">Partidos</a>
+            <a th:href="@{/predicciones}" th:classappend="${activo == 'predicciones'} ? 'activo'">Predicciones</a>
+        </nav>
+    </div>
+</header>
+</body>
+</html>

@@ -1,0 +1,9 @@
+.env
+target/
+media/
+*.pem
+_split.py
+tunel-token.txt
+evidencias/video/
+EL3304_LAB5_GUÍA.doc
+*.doc

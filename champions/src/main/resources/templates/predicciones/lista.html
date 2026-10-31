@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{nav :: head('Predicciones')}"></head>
+<body>
+<header th:replace="~{nav :: nav('predicciones')}"></header>
+<main class="pagina">
+    <h1>Predicciones registradas</h1>
+    <p class="subtitulo" th:text="${#lists.size(predicciones)} + ' predicciones guardadas'"></p>
+
+    <p th:if="${#lists.isEmpty(predicciones)}" class="vacio-grande">
+        Todavia no hay predicciones. <a th:href="@{/partidos}">Elija un partido</a> y registre la primera.
+    </p>
+
+    <div th:unless="${#lists.isEmpty(predicciones)}">
+        <div class="prediccion cabecera">
+            <div>Partido y prediccion</div>
+            <div>Estimado</div>
+            <div>Real</div>
+            <div>Estado</div>
+        </div>
+        <article class="prediccion" th:each="x : ${predicciones}">
+            <div>
+                <div class="equipo" th:text="${x.partido.equipoLocal} + ' vs ' + ${x.partido.equipoVisitante}"></div>
+                <div class="pick" th:text="${x.resultado == 'EMPATE'} ? 'Empate' : ('Gana ' + (${x.resultado == 'LOCAL'} ? ${x.partido.equipoLocal} : ${x.partido.equipoVisitante}))"></div>
+                <div class="pick" th:text="${#temporals.format(x.fechaRegistro, 'dd/MM/yyyy HH:mm')}"></div>
+            </div>
+            <div class="marcador" th:text="${x.golesLocal} + ' - ' + ${x.golesVisitante}"></div>
+            <div class="marcador" th:classappend="${x.partido.golesLocal == null} ? 'vacio'"
+                 th:text="${x.partido.golesLocal != null} ? ${x.partido.golesLocal} + ' - ' + ${x.partido.golesVisitante} : 'Sin dato'"></div>
+            <div class="estado">
+                <span class="chip" th:classappend="${x.acierto == 'Marcador exacto'} ? 'exacto' : (${x.acierto == 'Acerto ganador'} ? 'resultado')" th:text="${x.acierto}"></span>
+            </div>
+        </article>
+    </div>
+</main>
+</body>
+</html>

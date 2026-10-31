@@ -1,0 +1,45 @@
+services:
+
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - marketing_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    image: raith726/marketing-app:1.0
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT}:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      MEDIA_DIR: /data/media
+      APP_BASE_URL: ${APP_BASE_URL}
+      PUBLICAR_CLAVE: ${PUBLICAR_CLAVE}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_MODEL: ${GEMINI_MODEL}
+      INSTAGRAM_USER_ID: ${INSTAGRAM_USER_ID}
+      INSTAGRAM_TOKEN: ${INSTAGRAM_TOKEN}
+      TZ: America/Lima
+      JAVA_TOOL_OPTIONS: -Xmx300m
+    volumes:
+      - marketing_media:/data/media
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  marketing_data:
+  marketing_media:

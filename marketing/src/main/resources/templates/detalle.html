@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head('Campaña')}"></head>
+<body th:with="ocupada=${campana.ocupada},publicada=${campana.estado == 'PUBLICADA'},listo=${video != null}">
+<meta th:if="${campana.ocupada}" http-equiv="refresh" content="4">
+<header th:replace="~{base :: barra}"></header>
+<main class="pagina">
+    <ol class="pasos" aria-label="Avance de la campaña">
+        <li class="hecho">Foto</li>
+        <li th:classappend="${elegido != null} ? 'hecho' : 'actual'">Guion</li>
+        <li th:classappend="${listo} ? 'hecho' : (${elegido != null} ? 'actual')">Fotos y video</li>
+        <li th:classappend="${publicada} ? 'hecho' : (${listo} ? 'actual')">Instagram</li>
+    </ol>
+
+    <div th:if="${error}" class="aviso error" role="alert" th:text="${error}"></div>
+    <div th:if="${campana.estado == 'ERROR'}" class="aviso error" role="alert" th:text="${campana.mensaje}"></div>
+
+    <section class="resumen">
+        <img th:src="@{/media/{f}(f=${campana.foto})}" alt="Foto subida">
+        <div>
+            <h1 th:text="${elegido != null} ? ${elegido.titulo} : 'Elige un guion'"></h1>
+            <p class="intro" th:text="${campana.descripcion}"></p>
+        </div>
+    </section>
+
+    <section th:if="${!listo and !ocupada}">
+        <h2>Tres propuestas para esta foto</h2>
+        <form method="post" th:action="@{/campanas/{id}/elegir(id=${campana.id})}">
+            <div class="guiones">
+                <label class="guion" th:each="g, i : ${guiones}">
+                    <input type="radio" name="guionId" required th:value="${g.id}" th:checked="${g.id == campana.guionId or (campana.guionId == null and i.first)}">
+                    <span class="hoja">
+                        <span class="titulo-guion" th:text="${g.titulo}"></span>
+                        <span th:text="${g.texto}"></span>
+                    </span>
+                </label>
+            </div>
+            <button class="boton" type="submit">Usar este guion y generar contenido</button>
+        </form>
+    </section>
+
+    <div class="espera" th:if="${campana.estado == 'GENERANDO'}" role="status">
+        <div class="giro"></div>
+        <div><strong th:text="'Generando contenido: ' + ${#lists.size(fotos)} + ' de 3 fotos listas'"></strong><br>
+        Después se arma el video. Esta página se actualiza sola; tarda unos 3 minutos.</div>
+    </div>
+
+    <div class="espera" th:if="${campana.estado == 'PUBLICANDO'}" role="status">
+        <div class="giro"></div>
+        <div><strong>Publicando en Instagram</strong><br>Instagram procesa el video antes de publicarlo; puede tardar unos minutos.</div>
+    </div>
+
+    <section th:if="${elegido != null and (listo or ocupada)}">
+        <h2>Guion elegido</h2>
+        <p class="guion-elegido" th:text="${elegido.texto}"></p>
+    </section>
+
+    <section th:if="${listo}">
+        <h2>Fotos y video</h2>
+        <div class="medios">
+            <img th:each="f, i : ${fotos}" th:src="@{/media/{a}(a=${f.archivo})}" th:alt="'Foto generada ' + ${i.count}">
+            <video controls preload="metadata" th:src="@{/media/{a}(a=${video.archivo})}"></video>
+        </div>
+    </section>
+
+    <section th:if="${listo and !publicada and !ocupada}">
+        <h2>Publicar en Instagram</h2>
+        <div class="aviso" th:unless="${instagram}">Falta configurar la cuenta de Instagram en el servidor.</div>
+        <form class="publicar" method="post" th:if="${instagram}" th:action="@{/campanas/{id}/publicar(id=${campana.id})}">
+            <div>
+                <label class="campo" for="clave">Clave de publicación</label>
+                <input id="clave" type="password" name="clave" required autocomplete="off">
+            </div>
+            <button class="boton" type="submit">Publicar carrusel y reel</button>
+        </form>
+    </section>
+
+    <section th:if="${campana.urlCarrusel != null or campana.urlReel != null}">
+        <h2 th:text="${publicada} ? 'Publicado en Instagram' : 'Publicado hasta ahora'"></h2>
+        <div class="enlaces-ig">
+            <a class="boton claro" th:if="${campana.urlCarrusel != null}" th:href="${campana.urlCarrusel}" target="_blank" rel="noopener">Ver carrusel</a>
+            <a class="boton claro" th:if="${campana.urlReel != null}" th:href="${campana.urlReel}" target="_blank" rel="noopener">Ver reel</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>

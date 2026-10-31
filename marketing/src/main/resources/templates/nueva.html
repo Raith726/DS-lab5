@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head('Nueva campaña')}"></head>
+<body>
+<header th:replace="~{base :: barra}"></header>
+<main class="pagina">
+    <h1>Empieza con una foto</h1>
+    <p class="intro">Con esta foto y lo que nos cuentes, el sistema propone tres guiones.</p>
+
+    <div th:if="${error}" class="aviso error" role="alert" th:text="${error}"></div>
+
+    <form class="subida" id="formulario" method="post" enctype="multipart/form-data" th:action="@{/campanas}">
+        <label class="zona" id="zona">
+            <input id="foto" type="file" name="foto" accept="image/jpeg,image/png" required aria-label="Foto del producto">
+            <span>
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+                Arrastra una foto o haz clic para elegirla<br>
+                <small>JPG o PNG, hasta 10 MB</small>
+            </span>
+            <img id="vista" alt="" hidden>
+        </label>
+        <div>
+            <label class="campo" for="descripcion" th:text="${vision} ? 'Negocio y producto (opcional)' : 'Negocio y producto'"></label>
+            <textarea id="descripcion" name="descripcion" maxlength="500" th:required="${!vision}" th:text="${descripcion}"
+                      placeholder="Cafetería Don Pepe en Barranco. Café pasado de Chanchamayo, para gente que trabaja cerca."></textarea>
+            <p class="ayuda">Cuanto más concreto, mejores guiones.</p>
+            <button class="boton" id="enviar" type="submit">Proponer guiones</button>
+        </div>
+    </form>
+</main>
+<script>
+    const foto = document.getElementById('foto');
+    const vista = document.getElementById('vista');
+    const zona = document.getElementById('zona');
+
+    foto.addEventListener('change', () => {
+        if (foto.files[0]) {
+            vista.src = URL.createObjectURL(foto.files[0]);
+            vista.hidden = false;
+        }
+    });
+
+    ['dragenter', 'dragover'].forEach(e => zona.addEventListener(e, () => zona.classList.add('encima')));
+    ['dragleave', 'drop'].forEach(e => zona.addEventListener(e, () => zona.classList.remove('encima')));
+
+    document.getElementById('formulario').addEventListener('submit', () => {
+        const boton = document.getElementById('enviar');
+        boton.disabled = true;
+        boton.textContent = 'Escribiendo guiones, puede tardar un minuto...';
+    });
+</script>
+</body>
+</html>

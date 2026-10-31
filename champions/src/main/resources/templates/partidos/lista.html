@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{nav :: head('Partidos')}"></head>
+<body>
+<header th:replace="~{nav :: nav('partidos')}"></header>
+<main class="pagina">
+    <h1>Partidos de la Champions</h1>
+    <p class="subtitulo">
+        <span id="contador" th:text="${#lists.size(partidos)}"></span> partidos guardados en la base de datos. Temporada 2024/25.
+    </p>
+
+    <div th:if="${#lists.isEmpty(partidos)}" class="aviso error">
+        No hay partidos guardados. Revise la conexion con la API y reinicie la aplicacion.
+    </div>
+
+    <div class="filtros" th:unless="${#lists.isEmpty(partidos)}">
+        <div>
+            <label for="buscar">Buscar equipo</label>
+            <input id="buscar" type="search" placeholder="Barcelona, Inter, Arsenal...">
+        </div>
+        <div>
+            <label for="ronda">Ronda</label>
+            <select id="ronda">
+                <option value="">Todas las rondas</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="lista">
+        <article class="partido" th:each="p : ${partidos}"
+                 th:attr="data-ronda=${p.ronda},data-equipos=${#strings.toLowerCase(p.equipoLocal + ' ' + p.equipoVisitante)}">
+            <div class="fecha">
+                <div th:text="${#temporals.format(p.fecha, 'dd/MM/yyyy')}"></div>
+                <div th:text="${p.ronda}"></div>
+            </div>
+            <div class="equipo local" th:text="${p.equipoLocal}"></div>
+            <div class="marcador" th:classappend="${p.golesLocal == null} ? 'vacio'"
+                 th:text="${p.golesLocal != null} ? ${p.golesLocal} + ' - ' + ${p.golesVisitante} : 'Sin dato'"></div>
+            <div class="equipo" th:text="${p.equipoVisitante}"></div>
+            <a class="boton" th:href="@{/partidos/{id}/prediccion(id=${p.id})}">Predecir</a>
+        </article>
+    </div>
+    <p id="sinResultados" class="vacio-grande" hidden>Ningun partido coincide con esa busqueda.</p>
+</main>
+<script>
+    const filas = [...document.querySelectorAll('.partido')];
+    const buscar = document.getElementById('buscar');
+    const ronda = document.getElementById('ronda');
+
+    if (buscar) {
+        [...new Set(filas.map(f => f.dataset.ronda))].forEach(r => ronda.add(new Option(r, r)));
+
+        function filtrar() {
+            const texto = buscar.value.trim().toLowerCase();
+            let visibles = 0;
+
+            filas.forEach(f => {
+                const ok = f.dataset.equipos.includes(texto) && (!ronda.value || f.dataset.ronda === ronda.value);
+                f.hidden = !ok;
+                if (ok) visibles++;
+            });
+
+            document.getElementById('contador').textContent = visibles;
+            document.getElementById('sinResultados').hidden = visibles > 0;
+        }
+
+        buscar.addEventListener('input', filtrar);
+        ronda.addEventListener('change', filtrar);
+    }
+</script>
+</body>
+</html>
