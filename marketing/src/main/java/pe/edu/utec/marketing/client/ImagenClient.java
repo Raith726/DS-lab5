@@ -36,7 +36,9 @@ public class ImagenClient {
 
         String error = "";
 
-        for (int intento = 0; intento < 6; intento++) {
+        long espera = 12000;
+
+        for (int intento = 0; intento < 30; intento++) {
 
             HttpRequest request =
                 HttpRequest.newBuilder(URI.create(url))
@@ -61,12 +63,16 @@ public class ImagenClient {
 
                 error = "respondio " + response.statusCode();
 
+                espera = response.statusCode() == 402 || response.statusCode() == 429
+                    ? 46000
+                    : 12000;
+
             } catch (java.io.IOException e) {
 
                 error = e.getMessage();
             }
 
-            Thread.sleep(46000);
+            Thread.sleep(espera);
         }
 
         throw new IllegalStateException(
