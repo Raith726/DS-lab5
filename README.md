@@ -73,7 +73,9 @@ Flujo:
 2. Gemini analiza la foto y propone 3 guiones. Sin `GEMINI_API_KEY` se usa Pollinations y la descripcion pasa a ser obligatoria.
 3. El usuario elige un guion.
 4. Pollinations genera 3 fotos con las descripciones que escribio Gemini, y ffmpeg arma un video vertical de 16 segundos.
-5. La publicacion en Instagram esta programada con su API oficial (carrusel y reel). No se ejecuto porque Meta exige verificar la cuenta de desarrollador.
+5. Al publicar, la app sube a Instagram un carrusel con las fotos y un reel con el video, usando la API oficial, y guarda los enlaces.
+
+Perfil: https://www.instagram.com/zkaitoyt/. Publicaciones de prueba: https://www.instagram.com/p/DfKtwNBFw2d/ y https://www.instagram.com/reel/DfKt2MioGbu/
 
 TikTok no se usa porque exige auditar la aplicacion antes de publicar contenido publico.
 
@@ -96,7 +98,7 @@ Variables de `.env`:
 | `APP_BASE_URL` | URL publica, Instagram descarga los archivos desde ahi |
 | `PUBLICAR_CLAVE` | Clave que pide el formulario para publicar |
 | `GEMINI_API_KEY`, `GEMINI_MODEL` | Analisis de la foto y guiones |
-| `INSTAGRAM_USER_ID`, `INSTAGRAM_TOKEN` | Cuenta profesional de Instagram, para publicar |
+| `INSTAGRAM_USER_ID`, `INSTAGRAM_TOKEN` | Cuenta profesional de Instagram y token de Meta, para publicar |
 
 ## Despliegue en AWS
 

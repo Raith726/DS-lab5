@@ -23,7 +23,7 @@ import tools.jackson.databind.ObjectMapper;
 @Component
 public class InstagramClient {
 
-    private static final String API = "https://graph.instagram.com/v23.0/";
+    private static final String API = "https://graph.facebook.com/v23.0/";
 
     private final ObjectMapper mapper;
 
